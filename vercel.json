@@ -1,0 +1,33 @@
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/backend/api" }
+  ],
+  "builds": [
+    {
+      "src": "frontend/app/package.json",
+      "use": "@vercel/next",
+      "config": { "includeFiles": "frontend/app/**" }
+    },
+    {
+      "src": "backend/main.py",
+      "use": "@vercel/python",
+      "config": { "maxLambdaSize": "15mb", "runtime": "python3.9" }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "backend/main.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/app/$1"
+    }
+  ],
+  "env": {
+    "SECRET_KEY": "@todo-backend-secret-key",
+    "ALGORITHM": "HS256",
+    "ACCESS_TOKEN_EXPIRE_MINUTES": "30",
+    "DATABASE_URL": "@todo-backend-database-url"
+  }
+}
