@@ -13,9 +13,9 @@
     }
   ],
   "env": {
-    "SECRET_KEY": "@todo-backend-secret-key",
-    "ALGORITHM": "HS256",
-    "ACCESS_TOKEN_EXPIRE_MINUTES": "30",
-    "DATABASE_URL": "@todo-backend-database-url"
+    "SECRET_KEY": "$SECRET_KEY",
+    "ALGORITHM": "$ALGORITHM",
+    "ACCESS_TOKEN_EXPIRE_MINUTES": "$ACCESS_TOKEN_EXPIRE_MINUTES",
+    "DATABASE_URL": "$DATABASE_URL"
   }
 }
