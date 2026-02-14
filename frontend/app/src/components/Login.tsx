@@ -20,31 +20,43 @@ export default function Login() { // Removed onLoginSuccess prop
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Login</h1>
-      <form onSubmit={handleSubmit} className="mb-4">
-        <input
-          type="email"
-          autoComplete="username"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          className="border p-2 mb-2 w-full text-black"
-          required
-        />
-        <input
-          type="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          className="border p-2 mb-2 w-full text-black"
-          required
-        />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded" disabled={isLoading}>
+  return (
+    <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="email-login" className="sr-only">Email</label>
+          <input
+            id="email-login"
+            type="email"
+            autoComplete="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email Address"
+            className="w-full p-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="password-login" className="sr-only">Password</label>
+          <input
+            id="password-login"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className="w-full p-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out"
+          disabled={isLoading}
+        >
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
-        {authError && <p className="text-red-500 mt-2">Error: {authError}</p>}
+        {authError && <p className="mt-4 text-center text-red-600 text-sm">{authError}</p>}
       </form>
     </div>
   );

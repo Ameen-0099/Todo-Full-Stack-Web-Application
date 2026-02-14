@@ -16,6 +16,8 @@ interface Task {
   updated_at: string;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://192.168.1.44:8000';
+
 export default function Home() {
   const router = useRouter(); // Initialize useRouter
   const { isAuthenticated, user, logout, token, isLoading: authLoading, error: authError } = useAuth(); // Use useAuth hook
@@ -30,8 +32,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null); // Local error state for tasks
   const [showLogin, setShowLogin] = useState(true); // State to toggle between Login/Register forms
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000'; // Use environment variable
-
   useEffect(() => {
     if (isAuthenticated && token) {
       fetchTasks();
@@ -41,11 +41,6 @@ export default function Home() {
   }, [isAuthenticated, token, authLoading, filterStatus, sortField]); // Re-run when auth state changes or filter/sort changes
 
   const fetchTasks = async () => {
-    if (!token) {
-      setTasks([]);
-      setLoading(false);
-      return;
-    }
     setLoading(true);
     setError(null);
     try {
@@ -82,7 +77,7 @@ export default function Home() {
 
   const createTask = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTaskTitle.trim() || !token) return;
+    if (!newTaskTitle.trim()) return;
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/tasks`, {
@@ -104,7 +99,6 @@ export default function Home() {
   };
 
   const toggleTaskCompletion = async (id: number) => {
-    if (!token) return;
     try {
       const response = await fetch(`${API_BASE_URL}/api/tasks/${id}/complete`, {
         method: 'PATCH',
@@ -122,7 +116,6 @@ export default function Home() {
   };
 
   const updateTask = async (id: number, newTitle: string, newDescription: string | null) => {
-    if (!token) return;
     try {
       const response = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {
         method: 'PUT',
@@ -145,7 +138,6 @@ export default function Home() {
   };
 
   const deleteTask = async (id: number) => {
-    if (!token) return;
     try {
       const response = await fetch(`${API_BASE_URL}/api/tasks/${id}`, {
         method: 'DELETE',
@@ -170,75 +162,96 @@ export default function Home() {
 
   if (!isAuthenticated) {
     return (
-      <div className="container mx-auto p-4">
-        {authError && <p className="text-red-500 text-center mb-4">Authentication Error: {authError}</p>}
-        {showLogin ? (
-          <>
-            <Login /> {/* No props needed */}
-            <p className="mt-4 text-center">
-              Don't have an account?{' '}
-              <button onClick={() => setShowLogin(false)} className="text-blue-500">
-                Register
-              </button>
-            </p>
-          </>
-        ) : (
-          <>
-            <Register /> {/* No props needed */}
-            <p className="mt-4 text-center">
-              Already have an account?{' '}
-              <button onClick={() => setShowLogin(true)} className="text-blue-500">
-                Login
-              </button>
-            </p>
-          </>
-        )}
+      <div className="flex justify-center min-h-screen items-center bg-gray-100 py-6">
+        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+          {authError && <p className="text-red-500 text-center mb-4 text-sm">{authError}</p>}
+          {showLogin ? (
+            <>
+              <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">Login to Your Account</h2>
+              <Login />
+              <p className="mt-6 text-center text-gray-600">
+                Don't have an account?{' '}
+                <button
+                  onClick={() => setShowLogin(false)}
+                  className="text-blue-600 hover:text-blue-800 font-medium transition duration-150 ease-in-out"
+                >
+                  Register
+                </button>
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">Create an Account</h2>
+              <Register />
+              <p className="mt-6 text-center text-gray-600">
+                Already have an account?{' '}
+                <button
+                  onClick={() => setShowLogin(true)}
+                  className="text-blue-600 hover:text-blue-800 font-medium transition duration-150 ease-in-out"
+                >
+                  Login
+                </button>
+              </p>
+            </>
+          )}
+        </div>
       </div>
     );
   }
 
   // Render dashboard/tasks for authenticated users
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Todo App {user ? `for ${user.email}` : ''}</h1>
-        <button onClick={logout} className="bg-gray-500 text-white p-2 rounded">
-          Logout
-        </button>
-      </div>
+    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-xl">
+        <div className="flex justify-between items-center pb-4 mb-6 border-b border-gray-200">
+          <h1 className="text-3xl font-extrabold text-gray-900">
+            Todo App {user ? `for ${user.email}` : ''}
+          </h1>
+          <button
+            onClick={logout}
+            className="px-4 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition ease-in-out duration-150"
+          >
+            Logout
+          </button>
+        </div>
 
-      <form onSubmit={createTask} className="mb-4 flex">
+      <form onSubmit={createTask} className="flex gap-2 mb-6">
         <input
           type="text"
           value={newTaskTitle}
           onChange={(e) => setNewTaskTitle(e.target.value)}
           placeholder="Add a new task"
-          className="border p-2 flex-grow mr-2 text-black"
+          className="flex-grow p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-900"
         />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded">Add Task</button>
+        <button
+          type="submit"
+          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150"
+        >
+          Add Task
+        </button>
       </form>
 
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center">
-          <label htmlFor="filter" className="mr-2 text-black">Filter by Status:</label>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+        <div className="flex items-center gap-2">
+          <label htmlFor="filter" className="text-gray-700 font-medium">Filter by Status:</label>
           <select
             id="filter"
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="border p-2 rounded text-black"
+            className="p-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
           >
             <option value="all">All</option>
             <option value="pending">Pending</option>
             <option value="completed">Completed</option>
           </select>
         </div>
-        <div className="flex items-center">
-          <label htmlFor="sort" className="mr-2 text-black">Sort by:</label>
+        <div className="flex items-center gap-2">
+          <label htmlFor="sort" className="text-gray-700 font-medium">Sort by:</label>
           <select
             id="sort"
             value={sortField}
             onChange={(e) => setSortField(e.target.value)}
-            className="border p-2 rounded text-black"
+            className="p-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
           >
             <option value="created_at">Created At</option>
             <option value="title">Title</option>
@@ -251,28 +264,29 @@ export default function Home() {
 
       {!loading && tasks.length === 0 && <p>No tasks yet. Add one above!</p>}
 
-      <ul className="list-disc pl-5">
+      <ul className="space-y-3">
         {tasks.map((task) => (
-          <li key={task.id} className="flex items-center justify-between bg-gray-100 p-2 mb-2 rounded text-black">
+          <li key={task.id} className="bg-gray-50 p-4 rounded-lg shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             {editingTaskId === task.id ? (
               // Editing mode
-              <div className="flex-grow">
+              <div className="flex-grow w-full">
                 <input
                   type="text"
                   value={editedTaskTitle}
                   onChange={(e) => setEditedTaskTitle(e.target.value)}
-                  className="border p-1 w-full mb-1 text-black"
+                  className="border p-2 w-full mb-2 text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 />
                 <textarea
                   value={editedTaskDescription || ''}
                   onChange={(e) => setEditedTaskDescription(e.target.value)}
-                  className="border p-1 w-full text-black"
+                  className="border p-2 w-full text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   rows={2}
+                  placeholder="Task description (optional)"
                 />
-                <div className="flex justify-end mt-1">
+                <div className="flex justify-end gap-2 mt-3">
                   <button
                     onClick={() => updateTask(task.id, editedTaskTitle, editedTaskDescription)}
-                    className="bg-green-500 text-white p-1 rounded text-sm mr-2"
+                    className="px-3 py-1 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 text-sm transition ease-in-out duration-150"
                   >
                     Save
                   </button>
@@ -282,7 +296,7 @@ export default function Home() {
                       setEditedTaskTitle('');
                       setEditedTaskDescription(null);
                     }}
-                    className="bg-gray-500 text-white p-1 rounded text-sm"
+                    className="px-3 py-1 bg-gray-500 text-white font-semibold rounded-md hover:bg-gray-600 text-sm transition ease-in-out duration-150"
                   >
                     Cancel
                   </button>
@@ -290,32 +304,32 @@ export default function Home() {
               </div>
             ) : (
               // Display mode
-              <div className="flex-grow flex items-center">
+              <div className="flex-grow flex items-start sm:items-center gap-3 w-full">
                 <input
                   type="checkbox"
                   checked={task.completed}
                   onChange={() => toggleTaskCompletion(task.id)}
-                  className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="min-w-[20px] min-h-[20px] text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
                 />
-                <span className={`${task.completed ? 'line-through text-gray-500' : ''} flex-grow`}>
-                  <p className="font-semibold">{task.title}</p>
-                  {task.description && <p className="text-sm text-gray-700">{task.description}</p>}
+                <span className={`${task.completed ? 'line-through text-gray-500' : 'text-gray-800'} flex-grow`}>
+                  <p className="font-semibold text-lg">{task.title}</p>
+                  {task.description && <p className="text-sm text-gray-600">{task.description}</p>}
                 </span>
 
-                <div className="flex items-center">
+                <div className="flex-shrink-0 flex items-center gap-2 mt-2 sm:mt-0">
                   <button
                     onClick={() => {
                       setEditingTaskId(task.id);
                       setEditedTaskTitle(task.title);
                       setEditedTaskDescription(task.description);
                     }}
-                    className="bg-yellow-500 text-white p-1 rounded ml-2 text-sm"
+                    className="px-3 py-1 bg-yellow-500 text-white font-semibold rounded-md hover:bg-yellow-600 text-sm transition ease-in-out duration-150"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => deleteTask(task.id)}
-                    className="bg-red-500 text-white p-1 rounded ml-2 text-sm"
+                    className="px-3 py-1 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 text-sm transition ease-in-out duration-150"
                   >
                     Delete
                   </button>
