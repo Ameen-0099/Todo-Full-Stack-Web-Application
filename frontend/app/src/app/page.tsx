@@ -16,7 +16,7 @@ interface Task {
   updated_at: string;
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://192.168.1.44:8000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL 
 
 export default function Home() {
   const router = useRouter(); // Initialize useRouter
@@ -201,144 +201,147 @@ export default function Home() {
 
   // Render dashboard/tasks for authenticated users
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-xl">
-        <div className="flex justify-between items-center pb-4 mb-6 border-b border-gray-200">
-          <h1 className="text-3xl font-extrabold text-gray-900">
-            Todo App {user ? `for ${user.email}` : ''}
-          </h1>
-          <button
-            onClick={logout}
-            className="px-4 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition ease-in-out duration-150"
-          >
-            Logout
-          </button>
-        </div>
+    <>
+      <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-xl">
+          <div className="flex justify-between items-center pb-4 mb-6 border-b border-gray-200">
+            <h1 className="text-3xl font-extrabold text-gray-900">
+              Todo App {user ? `for ${user.email}` : ''}
+            </h1>
+            <button
+              onClick={logout}
+              className="px-4 py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition ease-in-out duration-150"
+            >
+              Logout
+            </button>
+          </div>
 
-      <form onSubmit={createTask} className="flex gap-2 mb-6">
-        <input
-          type="text"
-          value={newTaskTitle}
-          onChange={(e) => setNewTaskTitle(e.target.value)}
-          placeholder="Add a new task"
-          className="flex-grow p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-900"
-        />
-        <button
-          type="submit"
-          className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150"
-        >
-          Add Task
-        </button>
-      </form>
+          <form onSubmit={createTask} className="flex gap-2 mb-6">
+            <input
+              type="text"
+              value={newTaskTitle}
+              onChange={(e) => setNewTaskTitle(e.target.value)}
+              placeholder="Add a new task"
+              className="flex-grow p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out text-gray-900"
+            />
+            <button
+              type="submit"
+              className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition ease-in-out duration-150"
+            >
+              Add Task
+            </button>
+          </form>
 
-      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
-        <div className="flex items-center gap-2">
-          <label htmlFor="filter" className="text-gray-700 font-medium">Filter by Status:</label>
-          <select
-            id="filter"
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="p-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-          >
-            <option value="all">All</option>
-            <option value="pending">Pending</option>
-            <option value="completed">Completed</option>
-          </select>
-        </div>
-        <div className="flex items-center gap-2">
-          <label htmlFor="sort" className="text-gray-700 font-medium">Sort by:</label>
-          <select
-            id="sort"
-            value={sortField}
-            onChange={(e) => setSortField(e.target.value)}
-            className="p-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
-          >
-            <option value="created_at">Created At</option>
-            <option value="title">Title</option>
-          </select>
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              <label htmlFor="filter" className="text-gray-700 font-medium">Filter by Status:</label>
+              <select
+                id="filter"
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="p-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+              >
+                <option value="all">All</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <label htmlFor="sort" className="text-gray-700 font-medium">Sort by:</label>
+              <select
+                id="sort"
+                value={sortField}
+                onChange={(e) => setSortField(e.target.value)}
+                className="p-2 border border-gray-300 rounded-md bg-white text-gray-900 focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out"
+              >
+                <option value="created_at">Created At</option>
+                <option value="title">Title</option>
+              </select>
+            </div>
+          </div>
+
+          {loading && <p>Loading tasks...</p>}
+          {error && <p className="text-red-500">Error: {error}</p>}
+
+          {!loading && tasks.length === 0 && <p>No tasks yet. Add one above!</p>}
+
+          <ul className="space-y-3">
+            {tasks.map((task) => (
+              <li key={task.id} className="bg-gray-50 p-4 rounded-lg shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                {editingTaskId === task.id ? (
+                  // Editing mode
+                  <div className="flex-grow w-full">
+                    <input
+                      type="text"
+                      value={editedTaskTitle}
+                      onChange={(e) => setEditedTaskTitle(e.target.value)}
+                      className="border p-2 w-full mb-2 text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <textarea
+                      value={editedTaskDescription || ''}
+                      onChange={(e) => setEditedTaskDescription(e.target.value)}
+                      className="border p-2 w-full text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                      rows={2}
+                      placeholder="Task description (optional)"
+                    />
+                    <div className="flex justify-end gap-2 mt-3">
+                      <button
+                        onClick={() => updateTask(task.id, editedTaskTitle, editedTaskDescription)}
+                        className="px-3 py-1 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 text-sm transition ease-in-out duration-150"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditingTaskId(null);
+                          setEditedTaskTitle('');
+                          setEditedTaskDescription(null);
+                        }}
+                        className="px-3 py-1 bg-gray-500 text-white font-semibold rounded-md hover:bg-gray-600 text-sm transition ease-in-out duration-150"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  // Display mode
+                  <div className="flex-grow flex items-start sm:items-center gap-3 w-full">
+                    <input
+                      type="checkbox"
+                      checked={task.completed}
+                      onChange={() => toggleTaskCompletion(task.id)}
+                      className="min-w-[20px] min-h-[20px] text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className={`${task.completed ? 'line-through text-gray-500' : 'text-gray-800'} flex-grow`}>
+                      <p className="font-semibold text-lg">{task.title}</p>
+                      {task.description && <p className="text-sm text-gray-600">{task.description}</p>}
+                    </span>
+
+                    <div className="flex-shrink-0 flex items-center gap-2 mt-2 sm:mt-0">
+                      <button
+                        onClick={() => {
+                          setEditingTaskId(task.id);
+                          setEditedTaskTitle(task.title);
+                          setEditedTaskDescription(task.description);
+                        }}
+                        className="px-3 py-1 bg-yellow-500 text-white font-semibold rounded-md hover:bg-yellow-600 text-sm transition ease-in-out duration-150"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => deleteTask(task.id)}
+                        className="px-3 py-1 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 text-sm transition ease-in-out duration-150"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
-
-      {loading && <p>Loading tasks...</p>}
-      {error && <p className="text-red-500">Error: {error}</p>}
-
-      {!loading && tasks.length === 0 && <p>No tasks yet. Add one above!</p>}
-
-      <ul className="space-y-3">
-        {tasks.map((task) => (
-          <li key={task.id} className="bg-gray-50 p-4 rounded-lg shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            {editingTaskId === task.id ? (
-              // Editing mode
-              <div className="flex-grow w-full">
-                <input
-                  type="text"
-                  value={editedTaskTitle}
-                  onChange={(e) => setEditedTaskTitle(e.target.value)}
-                  className="border p-2 w-full mb-2 text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                />
-                <textarea
-                  value={editedTaskDescription || ''}
-                  onChange={(e) => setEditedTaskDescription(e.target.value)}
-                  className="border p-2 w-full text-gray-900 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                  rows={2}
-                  placeholder="Task description (optional)"
-                />
-                <div className="flex justify-end gap-2 mt-3">
-                  <button
-                    onClick={() => updateTask(task.id, editedTaskTitle, editedTaskDescription)}
-                    className="px-3 py-1 bg-green-600 text-white font-semibold rounded-md hover:bg-green-700 text-sm transition ease-in-out duration-150"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingTaskId(null);
-                      setEditedTaskTitle('');
-                      setEditedTaskDescription(null);
-                    }}
-                    className="px-3 py-1 bg-gray-500 text-white font-semibold rounded-md hover:bg-gray-600 text-sm transition ease-in-out duration-150"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            ) : (
-              // Display mode
-              <div className="flex-grow flex items-start sm:items-center gap-3 w-full">
-                <input
-                  type="checkbox"
-                  checked={task.completed}
-                  onChange={() => toggleTaskCompletion(task.id)}
-                  className="min-w-[20px] min-h-[20px] text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <span className={`${task.completed ? 'line-through text-gray-500' : 'text-gray-800'} flex-grow`}>
-                  <p className="font-semibold text-lg">{task.title}</p>
-                  {task.description && <p className="text-sm text-gray-600">{task.description}</p>}
-                </span>
-
-                <div className="flex-shrink-0 flex items-center gap-2 mt-2 sm:mt-0">
-                  <button
-                    onClick={() => {
-                      setEditingTaskId(task.id);
-                      setEditedTaskTitle(task.title);
-                      setEditedTaskDescription(task.description);
-                    }}
-                    className="px-3 py-1 bg-yellow-500 text-white font-semibold rounded-md hover:bg-yellow-600 text-sm transition ease-in-out duration-150"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => deleteTask(task.id)}
-                    className="px-3 py-1 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700 text-sm transition ease-in-out duration-150"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
+    </>
   );
 }
