@@ -20,7 +20,6 @@ export default function Register() { // Removed onRegisterSuccess prop
   };
 
   return (
-  return (
     <div className="space-y-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
